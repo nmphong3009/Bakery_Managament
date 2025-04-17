@@ -1,0 +1,9 @@
+services:
+  postgres:
+    image: 'postgres:latest'
+    environment:
+      - 'POSTGRES_DB=Bakery-Management-System'
+      - 'POSTGRES_PASSWORD=123456'
+      - 'POSTGRES_USER=postgres'
+    ports:
+      - '5678:5432'
