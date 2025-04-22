@@ -20,4 +20,6 @@ public class MenuRequest {
 
     private BigDecimal priceCost;
 
+    private Long categoryId;
+
 }
