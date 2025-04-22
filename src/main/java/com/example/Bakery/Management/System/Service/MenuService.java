@@ -2,8 +2,8 @@ package com.example.Bakery.Management.System.Service;
 
 import com.example.Bakery.Management.System.DTOS.Request.MenuRequest;
 import com.example.Bakery.Management.System.DTOS.Response.MenuResponse;
+import com.example.Bakery.Management.System.Entity.Category;
 import com.example.Bakery.Management.System.Entity.MenuItems;
-import com.example.Bakery.Management.System.Enum.Category;
 import com.example.Bakery.Management.System.Repository.MenuRepository;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseEntity;
@@ -31,12 +31,12 @@ public class MenuService {
         if (menuRepository.findByName(request.getName()).isPresent()){
             throw new RuntimeException("MenuItem already exists!");
         }
+
         MenuItems menuItems = MenuItems.builder()
                 .name(request.getName())
                 .description(request.getDescription())
                 .price(request.getPrice())
                 .priceCost(request.getPriceCost())
-                .category(request.getCategory())
                 .build();
         menuRepository.save(menuItems);
         return ResponseEntity.ok("Create MenuItem successful");
@@ -52,7 +52,6 @@ public class MenuService {
         menuItems.setDescription(request.getDescription());
         menuItems.setPrice(request.getPrice());
         menuItems.setPriceCost(request.getPriceCost());
-        menuItems.setCategory(request.getCategory());
         menuRepository.save(menuItems);
         return ResponseEntity.ok("Update MenuItem successful");
     }
@@ -67,8 +66,8 @@ public class MenuService {
         return ResponseEntity.ok("Delete MenuItem successful");
     }
 
-    public List<MenuResponse> getMenu(Category category){
-        List<MenuItems> menuItemsList = menuRepository.findAllByCategory(category);
+    public List<MenuResponse> getMenu(Long categoryId){
+        List<MenuItems> menuItemsList = menuRepository.findAllByCategoryId(categoryId);
         return menuItemsList.stream().map(
                 menuItems -> MenuResponse.builder()
                         .id(menuItems.getId())
@@ -76,7 +75,6 @@ public class MenuService {
                         .description(menuItems.getDescription())
                         .price(menuItems.getPrice())
                         .priceCost(menuItems.getPriceCost())
-                        .category(category)
                         .build()
         ).toList();
     }

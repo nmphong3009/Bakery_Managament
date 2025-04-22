@@ -1,6 +1,5 @@
 package com.example.Bakery.Management.System.Entity;
 
-import com.example.Bakery.Management.System.Enum.Category;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,6 +26,8 @@ public class MenuItems extends AbstractEntity<Long>{
     @Column
     private BigDecimal priceCost;
 
-    @Enumerated(EnumType.STRING)
+    @ManyToOne
+    @JoinColumn(name = "categoryId_id")
     private Category category;
+
 }

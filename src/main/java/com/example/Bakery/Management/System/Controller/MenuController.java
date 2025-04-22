@@ -2,7 +2,7 @@ package com.example.Bakery.Management.System.Controller;
 
 import com.example.Bakery.Management.System.DTOS.Request.MenuRequest;
 import com.example.Bakery.Management.System.DTOS.Response.MenuResponse;
-import com.example.Bakery.Management.System.Enum.Category;
+import com.example.Bakery.Management.System.Entity.Category;
 import com.example.Bakery.Management.System.Service.MenuService;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Lazy;
@@ -34,8 +34,8 @@ public class MenuController {
     }
 
     @GetMapping("getMenuByCategory")
-    public ResponseEntity<List<MenuResponse>> getMenu(Category category){
-        List<MenuResponse> menuResponses = menuService.getMenu(category);
+    public ResponseEntity<List<MenuResponse>> getMenu(Long categoryId){
+        List<MenuResponse> menuResponses = menuService.getMenu(categoryId);
         return ResponseEntity.ok(menuResponses);
     }
 }
