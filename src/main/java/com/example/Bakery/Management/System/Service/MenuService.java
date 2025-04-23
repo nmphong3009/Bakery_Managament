@@ -37,10 +37,6 @@ public class MenuService {
             throw new RuntimeException("MenuItem already exists!");
         }
 
-        if (categoryRepository.findById(request.getCategoryId()).isPresent()){
-            throw new RuntimeException("Category already exists!");
-        }
-
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Category not found with id: " + request.getCategoryId()));
 
@@ -58,9 +54,6 @@ public class MenuService {
     public ResponseEntity<?> update (MenuRequest request){
         if (!userService.isAdmin()) {
             throw new RuntimeException("Only admin users can access this resource.");
-        }
-        if (categoryRepository.findById(request.getCategoryId()).isPresent()){
-            throw new RuntimeException("Category already exists!");
         }
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Category not found with id: " + request.getCategoryId()));

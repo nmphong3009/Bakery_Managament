@@ -30,6 +30,8 @@ public class User extends AbstractEntity<Long> implements UserDetails {
     @Column
     private String passWord;
 
+    @Column
+    private Integer rewardPoints;
 
     @Enumerated(EnumType.STRING)
     private Role role;

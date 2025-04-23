@@ -15,5 +15,6 @@ public class UserResponse {
     private String fullName;
     private String phoneNumber;
     private String email;
+    private Integer rewardPoints;
     private Role role;
 }

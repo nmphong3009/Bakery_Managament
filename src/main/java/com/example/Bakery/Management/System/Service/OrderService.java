@@ -13,6 +13,7 @@ import com.example.Bakery.Management.System.Repository.MenuRepository;
 import com.example.Bakery.Management.System.Repository.OrderDetailRepository;
 import com.example.Bakery.Management.System.Repository.OrderRepository;
 import com.example.Bakery.Management.System.Repository.PayRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,22 +37,17 @@ public class OrderService {
     @Lazy
     private final PayRepository payRepository;
 
-    @Lazy
-    private final UserService userService;
-
-    public OrderService(OrderRepository orderRepository, MenuRepository menuRepository, OrderDetailRepository orderDetailRepository, PayRepository payRepository, UserService userService) {
+    public OrderService(OrderRepository orderRepository, MenuRepository menuRepository, OrderDetailRepository orderDetailRepository, PayRepository payRepository) {
         this.orderRepository = orderRepository;
         this.menuRepository = menuRepository;
         this.orderDetailRepository = orderDetailRepository;
         this.payRepository = payRepository;
-        this.userService = userService;
     }
 
     public ResponseEntity<?> createOrder (OrderRequest orderRequest){
-
         Orders orders = Orders.builder()
                 .totalPrice(BigDecimal.ZERO)
-                .user(userService.getCurrentUser())
+                .user(null)
                 .phoneNumber(orderRequest.getPhoneNumber())
                 .address(orderRequest.getAddress())
                 .ordersStatus(OrdersStatus.PENDING)
@@ -67,20 +63,18 @@ public class OrderService {
                     .quantity(item.getQuantity())
                     .build();
         }).collect(Collectors.toList());
-        BigDecimal totalPrice = orderRequest.getOrderDetailRequestList().stream()
-                .map(item -> {
-                    MenuItems menuItems = menuRepository.findById(item.getMenuId())
-                            .orElseThrow(() -> new RuntimeException("Menu item not found with id: " + item.getMenuId()));
-                    return menuItems.getPrice().multiply(BigDecimal.valueOf(item.getQuantity()));
-                })
+
+        BigDecimal totalPrice = orderDetailsList.stream()
+                .map(detail -> detail.getMenuItems().getPrice().multiply(BigDecimal.valueOf(detail.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         orders.setTotalPrice(totalPrice);
         orderRepository.save(orders);
         orderDetailRepository.saveAll(orderDetailsList);
-        Payments payments = payRepository.findByOrder(orders)
-                .orElseThrow(() -> new RuntimeException("Payment not found with id: " + orders));
-        payments.setAmount(orders.getTotalPrice());
-        payments.setPaymentStatus(PaymentStatus.PENDING);
+        Payments payments = Payments.builder()
+                .order(orders)
+                .amount(totalPrice)
+                .paymentStatus(PaymentStatus.PENDING)
+                .build();
         payRepository.save(payments);
         return ResponseEntity.ok("Order created successfully!");
     }

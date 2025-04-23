@@ -97,6 +97,7 @@ public class UserService implements UserDetailsService {
                 .fullName(getCurrentUser().getFullName())
                 .phoneNumber(getCurrentUser().getPhoneNumber())
                 .role(getCurrentUser().getRole())
+                .rewardPoints(getCurrentUser().getRewardPoints())
                 .build(), HttpStatus.OK);
     }
 
@@ -112,6 +113,7 @@ public class UserService implements UserDetailsService {
                 .fullName(user.getFullName())
                 .phoneNumber(user.getPhoneNumber())
                 .role(user.getRole())
+                .rewardPoints(user.getRewardPoints())
                 .build(), HttpStatus.OK);
     }
 

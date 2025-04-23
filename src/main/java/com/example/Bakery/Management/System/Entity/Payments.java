@@ -28,5 +28,12 @@ public class Payments extends AbstractEntity<Long>{
 
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus;
+
+    @Column
+    private String transactionCode;
+
+    public void generateTransactionCode() {
+        this.transactionCode = "PAY" + String.format("%010d", (int)(Math.random() * 1_000_000_0000L));
+    }
 }
 
