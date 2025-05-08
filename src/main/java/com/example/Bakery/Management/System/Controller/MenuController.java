@@ -19,22 +19,22 @@ public class MenuController {
     private final MenuService menuService;
 
     @PostMapping("admin/create")
-    public ResponseEntity<?> create (@RequestBody MenuRequest request){
+    public ResponseEntity<?> create(@RequestBody MenuRequest request) {
         return ResponseEntity.ok(menuService.create(request));
     }
 
     @PutMapping("admin/update")
-    public ResponseEntity<?> update (@RequestBody MenuRequest request){
+    public ResponseEntity<?> update(@RequestBody MenuRequest request) {
         return ResponseEntity.ok(menuService.update(request));
     }
 
     @DeleteMapping("admin/delete/{id}")
-    public ResponseEntity<?> delete (@PathVariable Long id){
+    public ResponseEntity<?> delete(@PathVariable Long id) {
         return ResponseEntity.ok(menuService.delete(id));
     }
 
     @GetMapping("getMenuByCategory")
-    public ResponseEntity<List<MenuResponse>> getMenu(Long categoryId){
+    public ResponseEntity<List<MenuResponse>> getMenu(Long categoryId) {
         List<MenuResponse> menuResponses = menuService.getMenu(categoryId);
         return ResponseEntity.ok(menuResponses);
     }

@@ -22,4 +22,6 @@ public class MenuRequest {
 
     private Long categoryId;
 
+    private Long imageId;
+
 }

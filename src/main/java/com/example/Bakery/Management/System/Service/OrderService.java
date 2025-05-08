@@ -13,7 +13,6 @@ import com.example.Bakery.Management.System.Repository.MenuRepository;
 import com.example.Bakery.Management.System.Repository.OrderDetailRepository;
 import com.example.Bakery.Management.System.Repository.OrderRepository;
 import com.example.Bakery.Management.System.Repository.PayRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

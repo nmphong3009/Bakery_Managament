@@ -1,5 +1,6 @@
 package com.example.Bakery.Management.System.DTOS.Response;
 
+import com.example.Bakery.Management.System.Entity.SourceImage;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -20,5 +21,7 @@ public class MenuResponse {
     private BigDecimal price;
 
     private BigDecimal priceCost;
+
+    private SourceImage sourceImage;
 
 }

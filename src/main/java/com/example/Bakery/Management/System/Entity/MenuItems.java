@@ -30,4 +30,8 @@ public class MenuItems extends AbstractEntity<Long>{
     @JoinColumn(name = "categoryId_id")
     private Category category;
 
+    @OneToOne
+    @JoinColumn(name = "image_id")
+    private SourceImage image;
+
 }

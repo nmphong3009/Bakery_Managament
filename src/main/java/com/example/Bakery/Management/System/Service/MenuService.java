@@ -4,8 +4,10 @@ import com.example.Bakery.Management.System.DTOS.Request.MenuRequest;
 import com.example.Bakery.Management.System.DTOS.Response.MenuResponse;
 import com.example.Bakery.Management.System.Entity.Category;
 import com.example.Bakery.Management.System.Entity.MenuItems;
+import com.example.Bakery.Management.System.Entity.SourceImage;
 import com.example.Bakery.Management.System.Repository.CategoryRepository;
 import com.example.Bakery.Management.System.Repository.MenuRepository;
+import com.example.Bakery.Management.System.Repository.SourceImageRepository;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -23,22 +25,29 @@ public class MenuService {
     @Lazy
     private final CategoryRepository categoryRepository;
 
-    public MenuService(MenuRepository menuRepository, UserService userService, CategoryRepository categoryRepository) {
+    @Lazy
+    private final SourceImageRepository sourceImageRepository;
+
+    public MenuService(MenuRepository menuRepository, UserService userService, CategoryRepository categoryRepository, SourceImageRepository sourceImageRepository) {
         this.menuRepository = menuRepository;
         this.userService = userService;
         this.categoryRepository = categoryRepository;
+        this.sourceImageRepository = sourceImageRepository;
     }
 
-    public ResponseEntity<?> create (MenuRequest request){
+    public ResponseEntity<?> create(MenuRequest request) {
         if (!userService.isAdmin()) {
             throw new RuntimeException("Only admin users can access this resource.");
         }
-        if (menuRepository.findByName(request.getName()).isPresent()){
+        if (menuRepository.findByName(request.getName()).isPresent()) {
             throw new RuntimeException("MenuItem already exists!");
         }
 
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Category not found with id: " + request.getCategoryId()));
+
+        SourceImage sourceImage = sourceImageRepository.findById(request.getId())
+                .orElseThrow(() -> new RuntimeException("Image not found with id: " + request.getId()));
 
         MenuItems menuItems = MenuItems.builder()
                 .name(request.getName())
@@ -46,12 +55,13 @@ public class MenuService {
                 .price(request.getPrice())
                 .priceCost(request.getPriceCost())
                 .category(category)
+                .image(sourceImage)
                 .build();
         menuRepository.save(menuItems);
         return ResponseEntity.ok("Create MenuItem successful");
     }
 
-    public ResponseEntity<?> update (MenuRequest request){
+    public ResponseEntity<?> update(MenuRequest request) {
         if (!userService.isAdmin()) {
             throw new RuntimeException("Only admin users can access this resource.");
         }
@@ -59,26 +69,29 @@ public class MenuService {
                 .orElseThrow(() -> new RuntimeException("Category not found with id: " + request.getCategoryId()));
         MenuItems menuItems = menuRepository.findById(request.getId())
                 .orElseThrow(() -> new RuntimeException("MenuItem not found with id: " + request.getId()));
+        SourceImage sourceImage = sourceImageRepository.findById(request.getId())
+                .orElseThrow(() -> new RuntimeException("Image not found with id: " + request.getId()));
         menuItems.setName(request.getName());
         menuItems.setDescription(request.getDescription());
         menuItems.setPrice(request.getPrice());
         menuItems.setPriceCost(request.getPriceCost());
         menuItems.setCategory(category);
+        menuItems.setImage(sourceImage);
         menuRepository.save(menuItems);
         return ResponseEntity.ok("Update MenuItem successful");
     }
 
-    public ResponseEntity<?> delete(Long id){
+    public ResponseEntity<?> delete(Long id) {
         if (!userService.isAdmin()) {
             throw new RuntimeException("Only admin users can access this resource.");
         }
         MenuItems menuItems = menuRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("MenuItem not found with id: " + id ));
+                .orElseThrow(() -> new RuntimeException("MenuItem not found with id: " + id));
         menuRepository.delete(menuItems);
         return ResponseEntity.ok("Delete MenuItem successful");
     }
 
-    public List<MenuResponse> getMenu(Long categoryId){
+    public List<MenuResponse> getMenu(Long categoryId) {
         List<MenuItems> menuItemsList = menuRepository.findAllByCategoryId(categoryId);
         return menuItemsList.stream().map(
                 menuItems -> MenuResponse.builder()
@@ -87,6 +100,7 @@ public class MenuService {
                         .description(menuItems.getDescription())
                         .price(menuItems.getPrice())
                         .priceCost(menuItems.getPriceCost())
+                        .sourceImage(menuItems.getImage())
                         .build()
         ).toList();
     }
