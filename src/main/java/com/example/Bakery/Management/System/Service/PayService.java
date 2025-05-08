@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -90,24 +91,22 @@ public class PayService {
     public ResponseEntity<OrderResponse> getOrder(Long orderId) {
         Orders orders = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found with id: " + orderId));
-        List<OrdersDetails> orderDetailsList = orderDetailRepository.findByOrder(orders);
+        List<OrdersDetails> orderDetails = orderDetailRepository.findByOrder(orders);
 
-        Map<MenuItems, Integer> quantityMap = orderDetailsList.stream()
-                .collect(Collectors.groupingBy(
-                        OrdersDetails::getMenuItems,
-                        Collectors.summingInt(OrdersDetails::getQuantity)
-                ));
-        List<OrderDetailResponse> detailResponses = quantityMap.entrySet().stream()
-                .map(entry -> OrderDetailResponse.builder()
-                        .name(entry.getKey().getName())
-                        .price(entry.getKey().getPrice())
-                        .quantity(entry.getValue())
-                        .build())
-                .collect(Collectors.toList());
+        List<OrderDetailResponse> detailResponses = orderDetails.stream().map(detail -> {
+            MenuItems item = detail.getMenuItems();
+            return new OrderDetailResponse(
+                    item.getName(),
+                    detail.getQuantity(),
+                    item.getPrice()
+            );
+        }).collect(Collectors.toList());
         OrderResponse response = OrderResponse.builder()
                 .id(orders.getId())
                 .totalPrice(orders.getTotalPrice())
                 .ordersStatus(orders.getOrdersStatus())
+                .address(orders.getAddress())
+                .phoneNumber(orders.getPhoneNumber())
                 .orderDetailResponseList(detailResponses)
                 .build();
         return ResponseEntity.ok(response);

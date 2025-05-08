@@ -3,10 +3,8 @@ package com.example.Bakery.Management.System.Entity;
 import com.example.Bakery.Management.System.Enum.OrdersStatus;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 
 @Getter
 @Setter

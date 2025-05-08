@@ -19,6 +19,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,7 +45,7 @@ public class OrderService {
         this.payRepository = payRepository;
     }
 
-    public ResponseEntity<?> createOrder (OrderRequest orderRequest){
+    public ResponseEntity<?> createOrder(OrderRequest orderRequest) {
         Orders orders = Orders.builder()
                 .totalPrice(BigDecimal.ZERO)
                 .user(null)
@@ -52,6 +54,7 @@ public class OrderService {
                 .ordersStatus(OrdersStatus.PENDING)
                 .build();
         orderRepository.save(orders);
+
         List<OrdersDetails> orderDetailsList = orderRequest.getOrderDetailRequestList().stream().map(item -> {
             MenuItems menuItems = menuRepository.findById(item.getMenuId())
                     .orElseThrow(() -> new RuntimeException("Menu item not found with id: " + item.getMenuId()));
@@ -64,21 +67,34 @@ public class OrderService {
         }).collect(Collectors.toList());
 
         BigDecimal totalPrice = orderDetailsList.stream()
-                .map(detail -> detail.getMenuItems().getPrice().multiply(BigDecimal.valueOf(detail.getQuantity())))
+                .map(detail -> {
+                    MenuItems menu = detail.getMenuItems();
+                    BigDecimal price = menu.getPrice();
+                    Integer discount = menu.getDisCount(); // phần trăm giảm giá
+                    if (discount != null && discount > 0) {
+                        BigDecimal discountRate = BigDecimal.valueOf(100 - discount).divide(BigDecimal.valueOf(100));
+                        price = price.multiply(discountRate);
+                    }
+                    return price.multiply(BigDecimal.valueOf(detail.getQuantity()));
+                })
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+
         orders.setTotalPrice(totalPrice);
         orderRepository.save(orders);
         orderDetailRepository.saveAll(orderDetailsList);
+
         Payments payments = Payments.builder()
                 .order(orders)
                 .amount(totalPrice)
                 .paymentStatus(PaymentStatus.PENDING)
+                .createdAt(LocalDate.now())
                 .build();
         payRepository.save(payments);
+
         return ResponseEntity.ok("Order created successfully!");
     }
 
-    public ResponseEntity<OrderResponse> getOrder(Long id){
+    public ResponseEntity<OrderResponse> getOrder(Long id) {
         Orders orders = orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Order not found with id: " + id));
         List<OrderDetailResponse> orderDetailResponses = orderDetailRepository.findByOrder(orders).stream()
@@ -98,7 +114,7 @@ public class OrderService {
                 .build(), HttpStatus.OK);
     }
 
-    public List<OrderResponse> getAllOrder(){
+    public List<OrderResponse> getAllOrder() {
         List<Orders> ordersList = orderRepository.findAll();
         return ordersList.stream().map(orders -> {
             List<OrderDetailResponse> orderDetailResponses = orderDetailRepository.findByOrder(orders).stream()
@@ -119,7 +135,7 @@ public class OrderService {
         }).collect(Collectors.toList());
     }
 
-    public ResponseEntity<OrderResponse> doOrder(Long id){
+    public ResponseEntity<OrderResponse> doOrder(Long id) {
         Orders orders = orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Order not found with id: " + id));
         orders.setOrdersStatus(OrdersStatus.PREPARING);
@@ -137,7 +153,7 @@ public class OrderService {
                 .build(), HttpStatus.OK);
     }
 
-    public ResponseEntity<?> doneOrder(Long id){
+    public ResponseEntity<?> doneOrder(Long id) {
         Orders orders = orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Order not found with id: " + id));
         orders.setOrdersStatus(OrdersStatus.COMPLETED);

@@ -20,8 +20,7 @@ public class MenuResponse {
 
     private BigDecimal price;
 
-    private BigDecimal priceCost;
-
     private SourceImage sourceImage;
 
+    private Integer disCount;
 }

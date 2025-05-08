@@ -65,9 +65,6 @@ public class CategoryService {
     }
 
     public List<CategoryResponse> getAllCategory(){
-        if (!userService.isAdmin()) {
-            throw new RuntimeException("Only admin users can access this resource.");
-        }
         List<Category> categoryList = categoryRepository.findAll();
         return categoryList.stream().map(
                 category -> CategoryResponse.builder()

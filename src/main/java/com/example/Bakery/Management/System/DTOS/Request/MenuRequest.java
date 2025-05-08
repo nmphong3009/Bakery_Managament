@@ -18,10 +18,10 @@ public class MenuRequest {
 
     private BigDecimal price;
 
-    private BigDecimal priceCost;
-
     private Long categoryId;
 
     private Long imageId;
+
+    private Integer disCount;
 
 }

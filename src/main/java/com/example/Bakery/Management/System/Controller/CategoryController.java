@@ -35,7 +35,7 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.delete(id));
     }
 
-    @GetMapping("admin/getAll")
+    @GetMapping("getAll")
     public ResponseEntity<List<CategoryResponse>> getAll(){
         List<CategoryResponse> categoryResponses = categoryService.getAllCategory();
         return ResponseEntity.ok(categoryResponses);

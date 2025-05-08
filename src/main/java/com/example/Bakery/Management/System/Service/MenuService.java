@@ -46,16 +46,16 @@ public class MenuService {
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Category not found with id: " + request.getCategoryId()));
 
-        SourceImage sourceImage = sourceImageRepository.findById(request.getId())
-                .orElseThrow(() -> new RuntimeException("Image not found with id: " + request.getId()));
+        SourceImage sourceImage = sourceImageRepository.findById(request.getImageId())
+                .orElseThrow(() -> new RuntimeException("Image not found with id: " + request.getImageId()));
 
         MenuItems menuItems = MenuItems.builder()
                 .name(request.getName())
                 .description(request.getDescription())
                 .price(request.getPrice())
-                .priceCost(request.getPriceCost())
                 .category(category)
                 .image(sourceImage)
+                .disCount(request.getDisCount())
                 .build();
         menuRepository.save(menuItems);
         return ResponseEntity.ok("Create MenuItem successful");
@@ -74,9 +74,9 @@ public class MenuService {
         menuItems.setName(request.getName());
         menuItems.setDescription(request.getDescription());
         menuItems.setPrice(request.getPrice());
-        menuItems.setPriceCost(request.getPriceCost());
         menuItems.setCategory(category);
         menuItems.setImage(sourceImage);
+        menuItems.setDisCount(request.getDisCount());
         menuRepository.save(menuItems);
         return ResponseEntity.ok("Update MenuItem successful");
     }
@@ -99,8 +99,8 @@ public class MenuService {
                         .name(menuItems.getName())
                         .description(menuItems.getDescription())
                         .price(menuItems.getPrice())
-                        .priceCost(menuItems.getPriceCost())
                         .sourceImage(menuItems.getImage())
+                        .disCount(menuItems.getDisCount())
                         .build()
         ).toList();
     }

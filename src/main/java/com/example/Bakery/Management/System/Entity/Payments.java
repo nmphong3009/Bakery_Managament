@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -22,6 +23,9 @@ public class Payments extends AbstractEntity<Long>{
 
     @Column
     private BigDecimal amount;
+
+    @Column
+    private LocalDate createdAt;
 
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;

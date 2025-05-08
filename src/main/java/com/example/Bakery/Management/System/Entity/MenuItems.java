@@ -24,10 +24,10 @@ public class MenuItems extends AbstractEntity<Long>{
     private BigDecimal price;
 
     @Column
-    private BigDecimal priceCost;
+    private Integer disCount;
 
     @ManyToOne
-    @JoinColumn(name = "categoryId_id")
+    @JoinColumn(name = "category_id")
     private Category category;
 
     @OneToOne
